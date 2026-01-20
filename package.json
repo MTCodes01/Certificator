@@ -1,0 +1,22 @@
+{
+  "name": "certificator",
+  "version": "1.0.0",
+  "description": "Figma plugin to automatically generate certificates from templates using Google Sheets data",
+  "main": "dist/code.js",
+  "scripts": {
+    "build": "node build.js",
+    "watch": "node build.js --watch"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.98.0",
+    "esbuild": "^0.20.0"
+  },
+  "keywords": [
+    "figma",
+    "plugin",
+    "certificate",
+    "generator"
+  ],
+  "author": "",
+  "license": "MIT"
+}
