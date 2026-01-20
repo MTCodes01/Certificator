@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Certificator</title>
+  <style>
+    :root {
+      --bg-primary: #1e1e1e;
+      --bg-secondary: #2d2d2d;
+      --bg-tertiary: #3d3d3d;
+      --text-primary: #ffffff;
+      --text-secondary: #a0a0a0;
+      --accent: #7c5cff;
+      --accent-hover: #9177ff;
+      --success: #4caf50;
+      --error: #f44336;
+      --border: #404040;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      padding: 16px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--accent), #ff6b9d);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .section {
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .template-card {
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      padding: 14px;
+      border: 1px solid var(--border);
+    }
+
+    .template-card.empty {
+      text-align: center;
+      padding: 24px 14px;
+      color: var(--text-secondary);
+    }
+
+    .template-card .icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .template-name {
+      font-weight: 500;
+      margin-bottom: 8px;
+      word-break: break-word;
+    }
+
+    .placeholders {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .placeholder-tag {
+      background: var(--bg-tertiary);
+      color: var(--accent);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-family: 'Monaco', 'Consolas', monospace;
+      font-size: 11px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab {
+      padding: 8px 16px;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tab:hover {
+      color: var(--text-primary);
+    }
+
+    .tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .input-group {
+      margin-bottom: 12px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .input-group input[type="url"] {
+      width: 100%;
+      padding: 10px 12px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-primary);
+      font-size: 13px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.2);
+    }
+
+    .input-group input::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .file-input-wrapper input[type="file"] {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .file-input-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 32px 12px;
+      background: var(--bg-secondary);
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .file-input-label:hover {
+      border-color: var(--accent);
+      color: var(--text-primary);
+    }
+
+    .file-input-label.has-file {
+      border-style: solid;
+      border-color: var(--accent);
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .hint {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:disabled {
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      cursor: not-allowed;
+    }
+
+    .progress-container {
+      display: none;
+      margin-top: 16px;
+    }
+
+    .progress-container.visible {
+      display: block;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #ff6b9d);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .status {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: 500;
+      display: none;
+      white-space: pre-line;
+    }
+
+    .status.visible {
+      display: block;
+    }
+
+    .status.success {
+      background: rgba(76, 175, 80, 0.15);
+      color: var(--success);
+    }
+
+    .status.error {
+      background: rgba(244, 67, 54, 0.15);
+      color: var(--error);
+    }
+
+    .steps {
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .step:last-child {
+      margin-bottom: 0;
+    }
+
+    .step-number {
+      width: 20px;
+      height: 20px;
+      background: var(--bg-tertiary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .step-number.active {
+      background: var(--accent);
+    }
+
+    .step-number.done {
+      background: var(--success);
+    }
+
+    .step-text {
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+
+    .step-text.active {
+      color: var(--text-primary);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <div class="logo">📜</div>
+    <h1>Certificator</h1>
+  </div>
+
+  <div class="section">
+    <div class="section-title">How to Use</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-number" id="step1">1</div>
+        <div class="step-text" id="step1-text">Select a frame to use as your template</div>
+      </div>
+      <div class="step">
+        <div class="step-number" id="step2">2</div>
+        <div class="step-text" id="step2-text">Add your data (URL or CSV file)</div>
+      </div>
+      <div class="step">
+        <div class="step-number" id="step3">3</div>
+        <div class="step-text" id="step3-text">Click Generate to create certificates</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Template</div>
+    <div class="template-card empty" id="template-info">
+      <div class="icon">📋</div>
+      <div>Select a frame in Figma to use as your certificate template</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Data Source</div>
+
+    <div class="tabs">
+      <button class="tab" data-tab="file">📄 CSV File</button>
+      <button class="tab active" data-tab="url">🔗 Google Sheet URL</button>
+    </div>
+
+    <div class="tab-content" id="file-tab">
+      <div class="input-group">
+        <label>Upload CSV File</label>
+        <div class="file-input-wrapper">
+          <input type="file" id="csv-file" accept=".csv">
+          <label for="csv-file" class="file-input-label" id="file-label">
+            <span>📄</span>
+            <span id="file-label-text">Click to select CSV file</span>
+          </label>
+        </div>
+        <div class="hint">💡 Download your sheet as CSV (File → Download → CSV)</div>
+      </div>
+    </div>
+
+    <div class="tab-content active" id="url-tab">
+      <div class="input-group">
+        <label for="sheet-url">Google Sheet URL</label>
+        <input type="url" id="sheet-url" placeholder="https://docs.google.com/spreadsheets/d/...">
+        <div class="hint">💡 Use "File → Share → Publish to web" (CSV format) for best results</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn btn-primary" id="generate-btn" disabled>
+    <span>✨</span>
+    <span>Generate Certificates</span>
+  </button>
+
+  <div class="progress-container" id="progress-container">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+    </div>
+    <div class="progress-text" id="progress-text">Generating...</div>
+  </div>
+
+  <div class="status" id="status"></div>
+
+  <script>
+    // State
+    let templateSelected = false;
+    let placeholders = [];
+    let currentTab = 'url';
+    let csvData = null;
+
+    // DOM elements
+    const templateInfo = document.getElementById('template-info');
+    const sheetUrlInput = document.getElementById('sheet-url');
+    const csvFileInput = document.getElementById('csv-file');
+    const fileLabel = document.getElementById('file-label');
+    const fileLabelText = document.getElementById('file-label-text');
+    const generateBtn = document.getElementById('generate-btn');
+    const progressContainer = document.getElementById('progress-container');
+    const progressFill = document.getElementById('progress-fill');
+    const progressText = document.getElementById('progress-text');
+    const statusDiv = document.getElementById('status');
+    const step1 = document.getElementById('step1');
+    const step1Text = document.getElementById('step1-text');
+    const step2 = document.getElementById('step2');
+    const step2Text = document.getElementById('step2-text');
+    const step3 = document.getElementById('step3');
+
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabName = tab.dataset.tab;
+
+        // Update active tab
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        // Update active content
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+
+        currentTab = tabName;
+        updateButtonState();
+      });
+    });
+
+    // File input handling
+    csvFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        if (!file.name.endsWith('.csv')) {
+          showStatus('Please select a CSV file', 'error');
+          return;
+        }
+
+        fileLabelText.textContent = file.name;
+        fileLabel.classList.add('has-file');
+
+        // Read and parse CSV
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const csv = event.target.result;
+            csvData = parseCsv(csv);
+            updateButtonState();
+            hideStatus();
+          } catch (error) {
+            showStatus('Error parsing CSV: ' + error.message, 'error');
+            csvData = null;
+            updateButtonState();
+          }
+        };
+        reader.readAsText(file);
+      } else {
+        fileLabelText.textContent = 'Click to select CSV file';
+        fileLabel.classList.remove('has-file');
+        csvData = null;
+        updateButtonState();
+      }
+    });
+
+    // Parse CSV to array of objects
+    function parseCsv(csv) {
+      const lines = csv.trim().split('\n');
+      if (lines.length < 2) {
+        throw new Error('CSV must have headers and at least one data row');
+      }
+
+      // Parse header row
+      const headers = parseCSVLine(lines[0]).map(h => h.trim().toLowerCase());
+
+      // Parse data rows
+      const data = [];
+      for (let i = 1; i < lines.length; i++) {
+        const values = parseCSVLine(lines[i]);
+        const row = {};
+        headers.forEach((header, index) => {
+          row[header] = values[index] ? values[index].trim() : '';
+        });
+        data.push(row);
+      }
+
+      return data;
+    }
+
+    // Parse a single CSV line (handles quoted values)
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+
+        if (char === '"') {
+          if (inQuotes && line[i + 1] === '"') {
+            current += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === ',' && !inQuotes) {
+          result.push(current);
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+
+      result.push(current);
+      return result;
+    }
+
+    // Update button state
+    function updateButtonState() {
+      let hasData = false;
+
+      if (currentTab === 'url') {
+        hasData = sheetUrlInput.value.trim().length > 0;
+      } else {
+        hasData = csvData !== null;
+      }
+
+      generateBtn.disabled = !templateSelected || !hasData;
+    }
+
+    // Validate Google Sheets URL
+    function validateSheetUrl(url) {
+      const patterns = [
+        /\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/,
+        /\/spreadsheets\/d\/e\/([a-zA-Z0-9-_]+)/,
+        /key=([a-zA-Z0-9-_]+)/
+      ];
+
+      for (const pattern of patterns) {
+        if (pattern.test(url)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    // Show status message
+    function showStatus(message, type) {
+      statusDiv.textContent = message;
+      statusDiv.className = 'status visible ' + type;
+    }
+
+    // Hide status message
+    function hideStatus() {
+      statusDiv.className = 'status';
+    }
+
+    // Event listeners
+    sheetUrlInput.addEventListener('input', updateButtonState);
+
+    generateBtn.addEventListener('click', () => {
+      hideStatus();
+
+      if (currentTab === 'file' && csvData) {
+        // Use CSV file data directly
+        generateBtn.disabled = true;
+        generateBtn.innerHTML = '<span>⏳</span><span>Processing...</span>';
+
+        // Check for missing columns
+        const dataColumns = Object.keys(csvData[0] || {});
+        const missingColumns = placeholders.filter(p => !dataColumns.includes(p));
+
+        if (missingColumns.length > 0) {
+          showStatus(`Warning: Missing columns in CSV:\n${missingColumns.join(', ')}`, 'error');
+        }
+
+        // Show progress bar
+        progressContainer.classList.add('visible');
+        progressFill.style.width = '0%';
+        progressText.textContent = `Generating 0 / ${csvData.length}`;
+
+        // Send data to plugin for generation
+        parent.postMessage({ pluginMessage: { type: 'generate', data: csvData } }, '*');
+
+      } else if (currentTab === 'url') {
+        // Fetch from URL
+        if (!validateSheetUrl(sheetUrlInput.value)) {
+          showStatus('Invalid Google Sheets URL', 'error');
+          return;
+        }
+
+        generateBtn.disabled = true;
+        generateBtn.innerHTML = '<span>⏳</span><span>Fetching data...</span>';
+
+        // Send URL to plugin code to fetch
+        parent.postMessage({
+          pluginMessage: {
+            type: 'fetch-sheet',
+            url: sheetUrlInput.value
+          }
+        }, '*');
+      }
+    });
+
+    // Handle messages from plugin
+    window.onmessage = (event) => {
+      const msg = event.data.pluginMessage;
+
+      if (msg.type === 'template-selected') {
+        templateSelected = true;
+        placeholders = msg.placeholders;
+
+        let html = `<div class="template-name">📋 ${msg.name}</div>`;
+        if (msg.placeholders.length > 0) {
+          html += '<div class="placeholders">';
+          msg.placeholders.forEach(p => {
+            html += `<span class="placeholder-tag">#${p}</span>`;
+          });
+          html += '</div>';
+        }
+        templateInfo.innerHTML = html;
+        templateInfo.classList.remove('empty');
+
+        step1.classList.add('done');
+        step1Text.classList.add('active');
+        step2.classList.add('active');
+        step2Text.classList.add('active');
+
+        updateButtonState();
+      }
+
+      if (msg.type === 'no-template') {
+        templateSelected = false;
+        placeholders = [];
+        templateInfo.innerHTML = `
+          <div class="icon">📋</div>
+          <div>Select a frame in Figma to use as your certificate template</div>
+        `;
+        templateInfo.classList.add('empty');
+
+        step1.classList.remove('done');
+        step1.classList.remove('active');
+        step1Text.classList.remove('active');
+        step2.classList.remove('active');
+        step2Text.classList.remove('active');
+
+        updateButtonState();
+      }
+
+      if (msg.type === 'sheet-data') {
+        // Successfully fetched data from plugin
+        const data = msg.data;
+
+        // Check for missing columns
+        const dataColumns = Object.keys(data[0] || {});
+        const missingColumns = placeholders.filter(p => !dataColumns.includes(p));
+
+        if (missingColumns.length > 0) {
+          showStatus(`Warning: Missing columns in sheet:\n${missingColumns.join(', ')}`, 'error');
+        }
+
+        // Show progress bar
+        progressContainer.classList.add('visible');
+        progressFill.style.width = '0%';
+        progressText.textContent = `Generating 0 / ${data.length}`;
+
+        // Send data to plugin for generation
+        parent.postMessage({ pluginMessage: { type: 'generate', data: data } }, '*');
+      }
+
+      if (msg.type === 'progress') {
+        const percent = (msg.current / msg.total) * 100;
+        progressFill.style.width = percent + '%';
+        progressText.textContent = `Generating ${msg.current} / ${msg.total}`;
+      }
+
+      if (msg.type === 'complete') {
+        progressContainer.classList.remove('visible');
+        showStatus(`✅ Successfully created ${msg.count} certificates!`, 'success');
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = '<span>✨</span><span>Generate Certificates</span>';
+        step3.classList.add('done');
+      }
+
+      if (msg.type === 'error') {
+        progressContainer.classList.remove('visible');
+        showStatus('❌ ' + msg.error, 'error');
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = '<span>✨</span><span>Generate Certificates</span>';
+      }
+    };
+  </script>
+</body>
+
+</html>
