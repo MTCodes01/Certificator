@@ -113,9 +113,12 @@ async function generateCertificates(data: SheetRow[]): Promise<void> {
   const maxPerColumn = Math.min(20, totalCerts); // Max 30 per column
   const numColumns = Math.ceil(totalCerts / maxPerColumn);
   
-  // Adjust spacing for better visibility
-  const horizontalSpacing = frameWidth * 0.5; // 50% of frame width for horizontal gap
-  const verticalSpacing = frameWidth - frameHeight + 20;  // vertical gap between certificates
+  // Spacing configuration - simple fixed pixel gaps
+  const HORIZONTAL_GAP_PERCENT = 0.5;  // 50% of frame width for horizontal spacing
+  const VERTICAL_GAP_PERCENT = 0.25;      // Fixed pixel gap between certificates vertically
+  
+  const horizontalSpacing = frameWidth * HORIZONTAL_GAP_PERCENT;
+  const verticalSpacing = frameHeight * VERTICAL_GAP_PERCENT;
   
   const startX = templateFrame.x + frameWidth + horizontalSpacing;
   const startY = templateFrame.y;
@@ -129,7 +132,7 @@ async function generateCertificates(data: SheetRow[]): Promise<void> {
     const column = Math.floor(i / maxPerColumn);
     const rowIndex = i % maxPerColumn;
     const x = startX + column * (frameWidth + horizontalSpacing);
-    const y = startY + rowIndex * (frameHeight + verticalSpacing);
+    const y = startY + rowIndex * (frameHeight - verticalSpacing);
     
     // Clone the template frame
     const clone = templateFrame.clone();
