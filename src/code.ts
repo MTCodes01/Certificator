@@ -110,12 +110,12 @@ async function generateCertificates(data: SheetRow[]): Promise<void> {
   
   // Calculate optimal layout based on number of certificates
   const totalCerts = data.length;
-  const maxPerColumn = Math.min(50, totalCerts); // Max 5 per column
+  const maxPerColumn = Math.min(20, totalCerts); // Max 30 per column
   const numColumns = Math.ceil(totalCerts / maxPerColumn);
   
   // Adjust spacing for better visibility
   const horizontalSpacing = frameWidth * 0.5; // 50% of frame width for horizontal gap
-  const verticalSpacing = frameHeight * 0.05;  // 5% of frame height for vertical gap
+  const verticalSpacing = frameWidth - frameHeight + 20;  // vertical gap between certificates
   
   const startX = templateFrame.x + frameWidth + horizontalSpacing;
   const startY = templateFrame.y;
