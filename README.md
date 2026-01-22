@@ -1,14 +1,47 @@
-# Certificator - Figma Certificate Generator Plugin
+# Certificator
 
-A Figma plugin that automatically generates certificates from a template frame using data from Google Sheets.
+A Figma plugin that automatically generates certificates from a template frame using CSV data.
 
 ## Features
 
-- 📋 **Template-based**: Select any frame as your certificate template
-- 🔗 **Google Sheets Integration**: Import data directly from public Google Sheets
-- ✨ **Placeholder System**: Use `#column-name` syntax for dynamic text replacement
-- 📐 **Smart Layout**: Generated certificates are arranged in columns automatically
-- 🌙 **Dark Theme UI**: Clean, modern interface that matches Figma's aesthetic
+- **Template-Based Generation**: Select any Figma frame as your certificate template
+- **Dynamic Placeholders**: Use `#columnname` syntax in text layers and frame names to insert data
+- **CSV File Upload**: Upload a CSV file with your data directly in the plugin
+- **Batch Processing**: Generate hundreds of certificates in seconds
+- **Smart Layout**: Automatically arranges generated certificates in columns
+- **Progress Tracking**: Real-time progress indicator during generation
+
+## How to Use
+
+### 1. Prepare Your Template
+
+Create a frame in Figma that will serve as your certificate template. Add text layers with placeholders using the `#` syntax:
+
+- `#name` - Will be replaced with the "name" column from your CSV
+- `#date` - Will be replaced with the "date" column
+- `#course` - Will be replaced with the "course" column
+- etc.
+
+You can also use placeholders in the frame name itself!
+
+### 2. Prepare Your Data
+
+Create a CSV file with your data. The first row should contain column headers (lowercase, matching your placeholders):
+
+```csv
+name,date,course
+John Doe,2024-01-15,Web Development
+Jane Smith,2024-01-16,Data Science
+```
+
+### 3. Generate Certificates
+
+1. Select your template frame in Figma
+2. Run the Certificator plugin (Plugins → Certificator)
+3. Upload your CSV file
+4. Click "Generate Certificates"
+
+The plugin will create individual certificate frames for each row in your CSV, automatically replacing all placeholders with the corresponding data.
 
 ## Installation
 
@@ -23,84 +56,64 @@ A Figma plugin that automatically generates certificates from a template frame u
    ```bash
    npm run build
    ```
-4. In Figma Desktop, go to **Plugins > Development > Import plugin from manifest**
-5. Select the `manifest.json` file from this directory
+4. In Figma Desktop:
+   - Go to Plugins → Development → Import plugin from manifest
+   - Select the `manifest.json` file from this repository
 
 ### For Production
 
-Coming soon to Figma Community!
-
-## Usage
-
-### 1. Create Your Template
-
-Design a certificate frame in Figma with placeholder text:
-
-- Use `#name` where you want the recipient's name
-- Use `#date` for the date
-- Use `#course`, `#email`, or any other column name from your sheet
-- The frame name can also include placeholders (e.g., `#name Certificate`)
-
-**Example placeholders:**
-```
-This certificate is awarded to #name
-for completing #course on #date
-```
-
-### 2. Prepare Your Google Sheet
-
-1. Create a Google Sheet with your data
-2. Use column headers that match your placeholders (e.g., `name`, `date`, `course`)
-3. **Important**: Share the sheet publicly ("Anyone with the link can view")
-
-| name | date | course |
-|------|------|--------|
-| John Doe | January 2026 | Web Development |
-| Jane Smith | January 2026 | UI Design |
-
-### 3. Generate Certificates
-
-1. Select your template frame in Figma
-2. Run the plugin (**Plugins > Certificator**)
-3. Paste your Google Sheet URL
-4. Click **Generate Certificates**
-
-The plugin will create a new certificate for each row in your sheet, positioned in columns next to your template.
-
-## Project Structure
-
-```
-Certificator/
-├── manifest.json      # Figma plugin manifest
-├── package.json       # Node.js dependencies
-├── tsconfig.json      # TypeScript configuration
-├── build.js           # Build script
-├── src/
-│   ├── code.ts        # Main plugin logic
-│   └── ui.html        # Plugin UI
-└── dist/              # Built files (generated)
-    ├── code.js
-    └── ui.html
-```
+*(Coming soon to Figma Community)*
 
 ## Development
 
-Watch mode for development:
-```bash
-npm run watch
+### Project Structure
+
+```
+Certificator/
+├── src/
+│   ├── code.ts          # Main plugin logic
+│   └── ui.html          # Plugin UI
+├── dist/                # Built files
+├── manifest.json        # Figma plugin manifest
+├── build.js            # Build script
+├── package.json        # Dependencies
+└── tsconfig.json       # TypeScript config
 ```
 
-Build for production:
-```bash
-npm run build
-```
+### Build Commands
 
-## Limitations
+- `npm run build` - Build the plugin once
+- `npm run watch` - Watch for changes and rebuild automatically
 
-- Google Sheet must be publicly accessible
-- Uses a free CORS proxy for fetching sheet data
-- Only the first sheet in the spreadsheet is used
+### Tech Stack
+
+- **TypeScript** - Main plugin code
+- **HTML/CSS/JavaScript** - Plugin UI
+- **esbuild** - Fast bundler
+- **Figma Plugin API** - For interacting with Figma
+
+## CSV Format Tips
+
+- First row must contain column headers
+- Column names should be lowercase and match your placeholders (without the `#`)
+- Values can contain spaces, special characters, etc.
+- Quoted values are supported for complex data
+
+## Placeholder Examples
+
+**Text Layer Examples:**
+- `Certificate of Completion for #name`
+- `Awarded on #date`
+- `Course: #course`
+
+**Frame Name Examples:**
+- `Certificate - #name`
+- `#course - #date`
 
 ## License
 
 MIT
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.

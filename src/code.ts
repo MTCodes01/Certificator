@@ -15,7 +15,6 @@ interface SheetRow {
 interface PluginMessage {
   type: string;
   data?: SheetRow[];
-  url?: string;
   error?: string;
 }
 
@@ -188,148 +187,11 @@ figma.on('selectionchange', handleSelectionChange);
 // Initial selection check
 handleSelectionChange();
 
-// Fetch Google Sheets data (plugin code has network access)
-async function fetchSheetData(url: string): Promise<SheetRow[]> {
-  try {
-    // Extract sheet ID
-    const patterns = [
-      /\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/,
-      /\/spreadsheets\/d\/e\/([a-zA-Z0-9-_]+)/,
-      /key=([a-zA-Z0-9-_]+)/
-    ];
-
-    let sheetId = null;
-    for (const pattern of patterns) {
-      const match = url.match(pattern);
-      if (match) {
-        sheetId = match[1];
-        break;
-      }
-    }
-
-    if (!sheetId) {
-      throw new Error('Invalid Google Sheets URL');
-    }
-
-    const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
-    
-    // Try direct access first (works for public sheets)
-    const urlsToTry = [
-      csvUrl, // Direct Google Sheets export
-      `https://thingproxy.freeboard.io/fetch/${csvUrl}`,
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(csvUrl)}`,
-      `https://corsproxy.io/?${encodeURIComponent(csvUrl)}`
-    ];
-
-    let lastError: Error | null = null;
-
-    for (const proxyUrl of urlsToTry) {
-      try {
-        // We use a simplified console here since we don't have the full environment
-        figma.ui.postMessage({ type: 'log', message: `Trying to fetch: ${proxyUrl.substring(0, 30)}...` });
-        
-        const response = await fetch(proxyUrl);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        const csv = await response.text();
-        
-        // Validate CSV
-        if (!csv || csv.length < 10 || csv.includes('<!DOCTYPE') || csv.includes('<html')) {
-          throw new Error('Invalid CSV response');
-        }
-
-        figma.ui.postMessage({ type: 'log', message: 'Success!' });
-        // Parse CSV
-        return parseCsv(csv);
-      } catch (error) {
-        lastError = error as Error;
-        continue;
-      }
-    }
-
-    throw new Error(`Failed to fetch sheet. Ensure it's publicly shared. Last error: ${lastError?.message || 'Unknown'}`);
-  } catch (error) {
-    throw error;
-  }
-}
-
-// Parse CSV to array of objects
-function parseCsv(csv: string): SheetRow[] {
-  // Fix the split logic to handle various newline formats
-  const lines = csv.trim().split(/\r\n|\r|\n/);
-  
-  if (lines.length < 2) {
-    throw new Error('Sheet must have headers and at least one data row');
-  }
-
-  // Parse header row
-  const headers = parseCSVLine(lines[0]).map(h => h.trim().toLowerCase());
-  
-  // Parse data rows
-  const data: SheetRow[] = [];
-  for (let i = 1; i < lines.length; i++) {
-    const values = parseCSVLine(lines[i]);
-    // Skip empty lines
-    if (values.length === 1 && values[0] === '') continue;
-    
-    const row: SheetRow = {};
-    headers.forEach((header, index) => {
-      row[header] = values[index] ? values[index].trim() : '';
-    });
-    data.push(row);
-  }
-
-  return data;
-}
-
-// Parse a single CSV line (handles quoted values)
-function parseCSVLine(line: string): string[] {
-  const result: string[] = [];
-  let current = '';
-  let inQuotes = false;
-
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-    
-    if (char === '"') {
-      if (inQuotes && line[i + 1] === '"') {
-        current += '"';
-        i++;
-      } else {
-        inQuotes = !inQuotes;
-      }
-    } else if (char === ',' && !inQuotes) {
-      result.push(current);
-      current = '';
-    } else {
-      current += char;
-    }
-  }
-  
-  result.push(current);
-  return result;
-}
-
 // Handle messages from UI
 figma.ui.onmessage = async (msg: PluginMessage) => {
-  if (msg.type === 'fetch-sheet') {
-    try {
-      const data = await fetchSheetData(msg.url!);
-      figma.ui.postMessage({ type: 'sheet-data', data });
-    } catch (error) {
-      figma.ui.postMessage({ 
-        type: 'error', 
-        error: error instanceof Error ? error.message : 'Failed to fetch sheet data' 
-      });
-    }
-  }
-  
   if (msg.type === 'generate') {
     if (!msg.data || msg.data.length === 0) {
-      figma.ui.postMessage({ type: 'error', error: 'No data received from Google Sheet' });
+      figma.ui.postMessage({ type: 'error', error: 'No data received' });
       return;
     }
     

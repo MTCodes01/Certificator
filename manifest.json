@@ -5,14 +5,5 @@
   "main": "dist/code.js",
   "ui": "dist/ui.html",
   "documentAccess": "dynamic-page",
-  "editorType": ["figma"],
-  "networkAccess": {
-    "allowedDomains": [
-      "https://docs.google.com",
-      "https://sheets.googleapis.com",
-      "https://corsproxy.io",
-      "https://api.allorigins.win",
-      "https://thingproxy.freeboard.io"
-    ]
-  }
+  "editorType": ["figma"]
 }

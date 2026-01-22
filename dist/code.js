@@ -1,4 +1,4 @@
-"use strict";(()=>{var R=(t,e)=>()=>(e||t((e={exports:{}}).exports,e),e.exports);var f=(t,e,r)=>new Promise((s,o)=>{var n=i=>{try{c(r.next(i))}catch(g){o(g)}},a=i=>{try{c(r.throw(i))}catch(g){o(g)}},c=i=>i.done?s(i.value):Promise.resolve(i.value).then(n,a);c((r=r.apply(t,e)).next())});var C=R(y=>{var m=5,p=50;figma.showUI(`<!DOCTYPE html>\r
+"use strict";(()=>{var M=(e,t)=>()=>(t||e((t={exports:{}}).exports,t),t.exports);var m=(e,t,a)=>new Promise((n,o)=>{var r=c=>{try{l(a.next(c))}catch(g){o(g)}},s=c=>{try{l(a.throw(c))}catch(g){o(g)}},l=c=>c.done?n(c.value):Promise.resolve(c.value).then(r,s);l((a=a.apply(e,t)).next())});var A=M(y=>{var d=5,h=50;figma.showUI(`<!DOCTYPE html>\r
 <html lang="en">\r
 \r
 <head>\r
@@ -111,41 +111,7 @@
       font-size: 11px;\r
     }\r
 \r
-    .tabs {\r
-      display: flex;\r
-      gap: 8px;\r
-      margin-bottom: 12px;\r
-      border-bottom: 1px solid var(--border);\r
-    }\r
 \r
-    .tab {\r
-      padding: 8px 16px;\r
-      background: none;\r
-      border: none;\r
-      color: var(--text-secondary);\r
-      cursor: pointer;\r
-      font-size: 13px;\r
-      font-weight: 500;\r
-      border-bottom: 2px solid transparent;\r
-      transition: all 0.2s;\r
-    }\r
-\r
-    .tab:hover {\r
-      color: var(--text-primary);\r
-    }\r
-\r
-    .tab.active {\r
-      color: var(--accent);\r
-      border-bottom-color: var(--accent);\r
-    }\r
-\r
-    .tab-content {\r
-      display: none;\r
-    }\r
-\r
-    .tab-content.active {\r
-      display: block;\r
-    }\r
 \r
     .input-group {\r
       margin-bottom: 12px;\r
@@ -375,7 +341,7 @@
       </div>\r
       <div class="step">\r
         <div class="step-number" id="step2">2</div>\r
-        <div class="step-text" id="step2-text">Add your data (URL or CSV file)</div>\r
+        <div class="step-text" id="step2-text">Upload your CSV file with data</div>\r
       </div>\r
       <div class="step">\r
         <div class="step-number" id="step3">3</div>\r
@@ -395,31 +361,16 @@
   <div class="section">\r
     <div class="section-title">Data Source</div>\r
 \r
-    <div class="tabs">\r
-      <button class="tab" data-tab="file">\u{1F4C4} CSV File</button>\r
-      <button class="tab active" data-tab="url">\u{1F517} Google Sheet URL</button>\r
-    </div>\r
-\r
-    <div class="tab-content" id="file-tab">\r
-      <div class="input-group">\r
-        <label>Upload CSV File</label>\r
-        <div class="file-input-wrapper">\r
-          <input type="file" id="csv-file" accept=".csv">\r
-          <label for="csv-file" class="file-input-label" id="file-label">\r
-            <span>\u{1F4C4}</span>\r
-            <span id="file-label-text">Click to select CSV file</span>\r
-          </label>\r
-        </div>\r
-        <div class="hint">\u{1F4A1} Download your sheet as CSV (File \u2192 Download \u2192 CSV)</div>\r
+    <div class="input-group">\r
+      <label>Upload CSV File</label>\r
+      <div class="file-input-wrapper">\r
+        <input type="file" id="csv-file" accept=".csv">\r
+        <label for="csv-file" class="file-input-label" id="file-label">\r
+          <span>\u{1F4C4}</span>\r
+          <span id="file-label-text">Click to select CSV file</span>\r
+        </label>\r
       </div>\r
-    </div>\r
-\r
-    <div class="tab-content active" id="url-tab">\r
-      <div class="input-group">\r
-        <label for="sheet-url">Google Sheet URL</label>\r
-        <input type="url" id="sheet-url" placeholder="https://docs.google.com/spreadsheets/d/...">\r
-        <div class="hint">\u{1F4A1} Use "File \u2192 Share \u2192 Publish to web" (CSV format) for best results</div>\r
-      </div>\r
+      <div class="hint">\u{1F4A1} Export your data as CSV (comma-separated values)</div>\r
     </div>\r
   </div>\r
 \r
@@ -441,12 +392,10 @@
     // State\r
     let templateSelected = false;\r
     let placeholders = [];\r
-    let currentTab = 'url';\r
     let csvData = null;\r
 \r
     // DOM elements\r
     const templateInfo = document.getElementById('template-info');\r
-    const sheetUrlInput = document.getElementById('sheet-url');\r
     const csvFileInput = document.getElementById('csv-file');\r
     const fileLabel = document.getElementById('file-label');\r
     const fileLabelText = document.getElementById('file-label-text');\r
@@ -460,24 +409,6 @@
     const step2 = document.getElementById('step2');\r
     const step2Text = document.getElementById('step2-text');\r
     const step3 = document.getElementById('step3');\r
-\r
-    // Tab switching\r
-    document.querySelectorAll('.tab').forEach(tab => {\r
-      tab.addEventListener('click', () => {\r
-        const tabName = tab.dataset.tab;\r
-\r
-        // Update active tab\r
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));\r
-        tab.classList.add('active');\r
-\r
-        // Update active content\r
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));\r
-        document.getElementById(\`\${tabName}-tab\`).classList.add('active');\r
-\r
-        currentTab = tabName;\r
-        updateButtonState();\r
-      });\r
-    });\r
 \r
     // File input handling\r
     csvFileInput.addEventListener('change', (e) => {\r
@@ -568,31 +499,7 @@
 \r
     // Update button state\r
     function updateButtonState() {\r
-      let hasData = false;\r
-\r
-      if (currentTab === 'url') {\r
-        hasData = sheetUrlInput.value.trim().length > 0;\r
-      } else {\r
-        hasData = csvData !== null;\r
-      }\r
-\r
-      generateBtn.disabled = !templateSelected || !hasData;\r
-    }\r
-\r
-    // Validate Google Sheets URL\r
-    function validateSheetUrl(url) {\r
-      const patterns = [\r
-        /\\/spreadsheets\\/d\\/([a-zA-Z0-9-_]+)/,\r
-        /\\/spreadsheets\\/d\\/e\\/([a-zA-Z0-9-_]+)/,\r
-        /key=([a-zA-Z0-9-_]+)/\r
-      ];\r
-\r
-      for (const pattern of patterns) {\r
-        if (pattern.test(url)) {\r
-          return true;\r
-        }\r
-      }\r
-      return false;\r
+      generateBtn.disabled = !templateSelected || csvData === null;\r
     }\r
 \r
     // Show status message\r
@@ -607,50 +514,33 @@
     }\r
 \r
     // Event listeners\r
-    sheetUrlInput.addEventListener('input', updateButtonState);\r
-\r
     generateBtn.addEventListener('click', () => {\r
       hideStatus();\r
 \r
-      if (currentTab === 'file' && csvData) {\r
-        // Use CSV file data directly\r
-        generateBtn.disabled = true;\r
-        generateBtn.innerHTML = '<span>\u23F3</span><span>Processing...</span>';\r
-\r
-        // Check for missing columns\r
-        const dataColumns = Object.keys(csvData[0] || {});\r
-        const missingColumns = placeholders.filter(p => !dataColumns.includes(p));\r
-\r
-        if (missingColumns.length > 0) {\r
-          showStatus(\`Warning: Missing columns in CSV:\\n\${missingColumns.join(', ')}\`, 'error');\r
-        }\r
-\r
-        // Show progress bar\r
-        progressContainer.classList.add('visible');\r
-        progressFill.style.width = '0%';\r
-        progressText.textContent = \`Generating 0 / \${csvData.length}\`;\r
-\r
-        // Send data to plugin for generation\r
-        parent.postMessage({ pluginMessage: { type: 'generate', data: csvData } }, '*');\r
-\r
-      } else if (currentTab === 'url') {\r
-        // Fetch from URL\r
-        if (!validateSheetUrl(sheetUrlInput.value)) {\r
-          showStatus('Invalid Google Sheets URL', 'error');\r
-          return;\r
-        }\r
-\r
-        generateBtn.disabled = true;\r
-        generateBtn.innerHTML = '<span>\u23F3</span><span>Fetching data...</span>';\r
-\r
-        // Send URL to plugin code to fetch\r
-        parent.postMessage({\r
-          pluginMessage: {\r
-            type: 'fetch-sheet',\r
-            url: sheetUrlInput.value\r
-          }\r
-        }, '*');\r
+      if (!csvData) {\r
+        showStatus('Please upload a CSV file first', 'error');\r
+        return;\r
       }\r
+\r
+      // Use CSV file data directly\r
+      generateBtn.disabled = true;\r
+      generateBtn.innerHTML = '<span>\u23F3</span><span>Processing...</span>';\r
+\r
+      // Check for missing columns\r
+      const dataColumns = Object.keys(csvData[0] || {});\r
+      const missingColumns = placeholders.filter(p => !dataColumns.includes(p));\r
+\r
+      if (missingColumns.length > 0) {\r
+        showStatus(\`Warning: Missing columns in CSV:\\n\${missingColumns.join(', ')}\`, 'error');\r
+      }\r
+\r
+      // Show progress bar\r
+      progressContainer.classList.add('visible');\r
+      progressFill.style.width = '0%';\r
+      progressText.textContent = \`Generating 0 / \${csvData.length}\`;\r
+\r
+      // Send data to plugin for generation\r
+      parent.postMessage({ pluginMessage: { type: 'generate', data: csvData } }, '*');\r
     });\r
 \r
     // Handle messages from plugin\r
@@ -698,27 +588,6 @@
         updateButtonState();\r
       }\r
 \r
-      if (msg.type === 'sheet-data') {\r
-        // Successfully fetched data from plugin\r
-        const data = msg.data;\r
-\r
-        // Check for missing columns\r
-        const dataColumns = Object.keys(data[0] || {});\r
-        const missingColumns = placeholders.filter(p => !dataColumns.includes(p));\r
-\r
-        if (missingColumns.length > 0) {\r
-          showStatus(\`Warning: Missing columns in sheet:\\n\${missingColumns.join(', ')}\`, 'error');\r
-        }\r
-\r
-        // Show progress bar\r
-        progressContainer.classList.add('visible');\r
-        progressFill.style.width = '0%';\r
-        progressText.textContent = \`Generating 0 / \${data.length}\`;\r
-\r
-        // Send data to plugin for generation\r
-        parent.postMessage({ pluginMessage: { type: 'generate', data: data } }, '*');\r
-      }\r
-\r
       if (msg.type === 'progress') {\r
         const percent = (msg.current / msg.total) * 100;\r
         progressFill.style.width = percent + '%';\r
@@ -743,4 +612,4 @@
   <\/script>\r
 </body>\r
 \r
-</html>`,{width:360,height:480,themeColors:!0});var l=null;function E(t){let e=new Set;function r(s){if(s.type==="TEXT"){let n=s.characters.match(/#[a-zA-Z_][a-zA-Z0-9_]*/g);n&&n.forEach(a=>e.add(a.substring(1).toLowerCase()))}"children"in s&&s.children.forEach(o=>r(o))}return r(t),Array.from(e)}function x(t){let e=t.match(/#[a-zA-Z_][a-zA-Z0-9_]*/g);return e?e.map(r=>r.substring(1).toLowerCase()):[]}function d(t,e){return f(this,null,function*(){if(t.type==="TEXT"){let r=t,s=r.characters;yield Promise.all(r.getRangeAllFontNames(0,r.characters.length).map(o=>figma.loadFontAsync(o)));for(let[o,n]of Object.entries(e)){let a=new RegExp(`#${o}`,"gi");s=s.replace(a,n)}r.characters=s}if("children"in t)for(let r of t.children)yield d(r,e)})}function N(t,e){let r=t;for(let[s,o]of Object.entries(e)){let n=new RegExp(`#${s}`,"gi");r=r.replace(n,o)}return r}function P(t){return f(this,null,function*(){if(!l){figma.ui.postMessage({type:"error",error:"No template frame selected"});return}let e=l.width,r=l.height,s=l.x+e+p,o=l.y,n=[];for(let a=0;a<t.length;a++){let c=t[a],i=Math.floor(a/m),g=a%m,S=s+i*(e+p),M=o+g*(r+p),h=l.clone();h.x=S,h.y=M,h.name=N(l.name,c),yield d(h,c),n.push(h),figma.ui.postMessage({type:"progress",current:a+1,total:t.length})}figma.currentPage.selection=n,figma.viewport.scrollAndZoomIntoView(n),figma.ui.postMessage({type:"complete",count:n.length})})}function w(){let t=figma.currentPage.selection;if(t.length===1&&t[0].type==="FRAME"){l=t[0];let e=E(l),r=x(l.name),s=[...new Set([...e,...r])];figma.ui.postMessage({type:"template-selected",name:l.name,placeholders:s})}else l=null,figma.ui.postMessage({type:"no-template"})}figma.on("selectionchange",w);w();function v(t){return f(this,null,function*(){try{let e=[/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/,/\/spreadsheets\/d\/e\/([a-zA-Z0-9-_]+)/,/key=([a-zA-Z0-9-_]+)/],r=null;for(let a of e){let c=t.match(a);if(c){r=c[1];break}}if(!r)throw new Error("Invalid Google Sheets URL");let s=`https://docs.google.com/spreadsheets/d/${r}/export?format=csv`,o=[s,`https://thingproxy.freeboard.io/fetch/${s}`,`https://api.allorigins.win/raw?url=${encodeURIComponent(s)}`,`https://corsproxy.io/?${encodeURIComponent(s)}`],n=null;for(let a of o)try{figma.ui.postMessage({type:"log",message:`Trying to fetch: ${a.substring(0,30)}...`});let c=yield fetch(a);if(!c.ok)throw new Error(`HTTP ${c.status}`);let i=yield c.text();if(!i||i.length<10||i.includes("<!DOCTYPE")||i.includes("<html"))throw new Error("Invalid CSV response");return figma.ui.postMessage({type:"log",message:"Success!"}),A(i)}catch(c){n=c;continue}throw new Error(`Failed to fetch sheet. Ensure it's publicly shared. Last error: ${(n==null?void 0:n.message)||"Unknown"}`)}catch(e){throw e}})}function A(t){let e=t.trim().split(/\r\n|\r|\n/);if(e.length<2)throw new Error("Sheet must have headers and at least one data row");let r=u(e[0]).map(o=>o.trim().toLowerCase()),s=[];for(let o=1;o<e.length;o++){let n=u(e[o]);if(n.length===1&&n[0]==="")continue;let a={};r.forEach((c,i)=>{a[c]=n[i]?n[i].trim():""}),s.push(a)}return s}function u(t){let e=[],r="",s=!1;for(let o=0;o<t.length;o++){let n=t[o];n==='"'?s&&t[o+1]==='"'?(r+='"',o++):s=!s:n===","&&!s?(e.push(r),r=""):r+=n}return e.push(r),e}figma.ui.onmessage=t=>f(y,null,function*(){if(t.type==="fetch-sheet")try{let e=yield v(t.url);figma.ui.postMessage({type:"sheet-data",data:e})}catch(e){figma.ui.postMessage({type:"error",error:e instanceof Error?e.message:"Failed to fetch sheet data"})}if(t.type==="generate"){if(!t.data||t.data.length===0){figma.ui.postMessage({type:"error",error:"No data received from Google Sheet"});return}try{yield P(t.data)}catch(e){figma.ui.postMessage({type:"error",error:e instanceof Error?e.message:"Unknown error occurred"})}}t.type==="cancel"&&figma.closePlugin()})});C();})();
+</html>`,{width:360,height:480,themeColors:!0});var i=null;function x(e){let t=new Set;function a(n){if(n.type==="TEXT"){let r=n.characters.match(/#[a-zA-Z_][a-zA-Z0-9_]*/g);r&&r.forEach(s=>t.add(s.substring(1).toLowerCase()))}"children"in n&&n.children.forEach(o=>a(o))}return a(e),Array.from(t)}function P(e){let t=e.match(/#[a-zA-Z_][a-zA-Z0-9_]*/g);return t?t.map(a=>a.substring(1).toLowerCase()):[]}function p(e,t){return m(this,null,function*(){if(e.type==="TEXT"){let a=e,n=a.characters;yield Promise.all(a.getRangeAllFontNames(0,a.characters.length).map(o=>figma.loadFontAsync(o)));for(let[o,r]of Object.entries(t)){let s=new RegExp(`#${o}`,"gi");n=n.replace(s,r)}a.characters=n}if("children"in e)for(let a of e.children)yield p(a,t)})}function R(e,t){let a=e;for(let[n,o]of Object.entries(t)){let r=new RegExp(`#${n}`,"gi");a=a.replace(r,o)}return a}function S(e){return m(this,null,function*(){if(!i){figma.ui.postMessage({type:"error",error:"No template frame selected"});return}let t=i.width,a=i.height,n=i.x+t+h,o=i.y,r=[];for(let s=0;s<e.length;s++){let l=e[s],c=Math.floor(s/d),g=s%d,w=n+c*(t+h),N=o+g*(a+h),f=i.clone();f.x=w,f.y=N,f.name=R(i.name,l),yield p(f,l),r.push(f),figma.ui.postMessage({type:"progress",current:s+1,total:e.length})}figma.currentPage.selection=r,figma.viewport.scrollAndZoomIntoView(r),figma.ui.postMessage({type:"complete",count:r.length})})}function u(){let e=figma.currentPage.selection;if(e.length===1&&e[0].type==="FRAME"){i=e[0];let t=x(i),a=P(i.name),n=[...new Set([...t,...a])];figma.ui.postMessage({type:"template-selected",name:i.name,placeholders:n})}else i=null,figma.ui.postMessage({type:"no-template"})}figma.on("selectionchange",u);u();figma.ui.onmessage=e=>m(y,null,function*(){if(e.type==="generate"){if(!e.data||e.data.length===0){figma.ui.postMessage({type:"error",error:"No data received"});return}try{yield S(e.data)}catch(t){figma.ui.postMessage({type:"error",error:t instanceof Error?t.message:"Unknown error occurred"})}}e.type==="cancel"&&figma.closePlugin()})});A();})();

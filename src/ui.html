@@ -111,41 +111,7 @@
       font-size: 11px;
     }
 
-    .tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
-      border-bottom: 1px solid var(--border);
-    }
 
-    .tab {
-      padding: 8px 16px;
-      background: none;
-      border: none;
-      color: var(--text-secondary);
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 500;
-      border-bottom: 2px solid transparent;
-      transition: all 0.2s;
-    }
-
-    .tab:hover {
-      color: var(--text-primary);
-    }
-
-    .tab.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
 
     .input-group {
       margin-bottom: 12px;
@@ -375,7 +341,7 @@
       </div>
       <div class="step">
         <div class="step-number" id="step2">2</div>
-        <div class="step-text" id="step2-text">Add your data (URL or CSV file)</div>
+        <div class="step-text" id="step2-text">Upload your CSV file with data</div>
       </div>
       <div class="step">
         <div class="step-number" id="step3">3</div>
@@ -395,31 +361,16 @@
   <div class="section">
     <div class="section-title">Data Source</div>
 
-    <div class="tabs">
-      <button class="tab" data-tab="file">📄 CSV File</button>
-      <button class="tab active" data-tab="url">🔗 Google Sheet URL</button>
-    </div>
-
-    <div class="tab-content" id="file-tab">
-      <div class="input-group">
-        <label>Upload CSV File</label>
-        <div class="file-input-wrapper">
-          <input type="file" id="csv-file" accept=".csv">
-          <label for="csv-file" class="file-input-label" id="file-label">
-            <span>📄</span>
-            <span id="file-label-text">Click to select CSV file</span>
-          </label>
-        </div>
-        <div class="hint">💡 Download your sheet as CSV (File → Download → CSV)</div>
+    <div class="input-group">
+      <label>Upload CSV File</label>
+      <div class="file-input-wrapper">
+        <input type="file" id="csv-file" accept=".csv">
+        <label for="csv-file" class="file-input-label" id="file-label">
+          <span>📄</span>
+          <span id="file-label-text">Click to select CSV file</span>
+        </label>
       </div>
-    </div>
-
-    <div class="tab-content active" id="url-tab">
-      <div class="input-group">
-        <label for="sheet-url">Google Sheet URL</label>
-        <input type="url" id="sheet-url" placeholder="https://docs.google.com/spreadsheets/d/...">
-        <div class="hint">💡 Use "File → Share → Publish to web" (CSV format) for best results</div>
-      </div>
+      <div class="hint">💡 Export your data as CSV (comma-separated values)</div>
     </div>
   </div>
 
@@ -441,12 +392,10 @@
     // State
     let templateSelected = false;
     let placeholders = [];
-    let currentTab = 'url';
     let csvData = null;
 
     // DOM elements
     const templateInfo = document.getElementById('template-info');
-    const sheetUrlInput = document.getElementById('sheet-url');
     const csvFileInput = document.getElementById('csv-file');
     const fileLabel = document.getElementById('file-label');
     const fileLabelText = document.getElementById('file-label-text');
@@ -460,24 +409,6 @@
     const step2 = document.getElementById('step2');
     const step2Text = document.getElementById('step2-text');
     const step3 = document.getElementById('step3');
-
-    // Tab switching
-    document.querySelectorAll('.tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        const tabName = tab.dataset.tab;
-
-        // Update active tab
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-
-        // Update active content
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.getElementById(`${tabName}-tab`).classList.add('active');
-
-        currentTab = tabName;
-        updateButtonState();
-      });
-    });
 
     // File input handling
     csvFileInput.addEventListener('change', (e) => {
@@ -568,31 +499,7 @@
 
     // Update button state
     function updateButtonState() {
-      let hasData = false;
-
-      if (currentTab === 'url') {
-        hasData = sheetUrlInput.value.trim().length > 0;
-      } else {
-        hasData = csvData !== null;
-      }
-
-      generateBtn.disabled = !templateSelected || !hasData;
-    }
-
-    // Validate Google Sheets URL
-    function validateSheetUrl(url) {
-      const patterns = [
-        /\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/,
-        /\/spreadsheets\/d\/e\/([a-zA-Z0-9-_]+)/,
-        /key=([a-zA-Z0-9-_]+)/
-      ];
-
-      for (const pattern of patterns) {
-        if (pattern.test(url)) {
-          return true;
-        }
-      }
-      return false;
+      generateBtn.disabled = !templateSelected || csvData === null;
     }
 
     // Show status message
@@ -607,50 +514,33 @@
     }
 
     // Event listeners
-    sheetUrlInput.addEventListener('input', updateButtonState);
-
     generateBtn.addEventListener('click', () => {
       hideStatus();
 
-      if (currentTab === 'file' && csvData) {
-        // Use CSV file data directly
-        generateBtn.disabled = true;
-        generateBtn.innerHTML = '<span>⏳</span><span>Processing...</span>';
-
-        // Check for missing columns
-        const dataColumns = Object.keys(csvData[0] || {});
-        const missingColumns = placeholders.filter(p => !dataColumns.includes(p));
-
-        if (missingColumns.length > 0) {
-          showStatus(`Warning: Missing columns in CSV:\n${missingColumns.join(', ')}`, 'error');
-        }
-
-        // Show progress bar
-        progressContainer.classList.add('visible');
-        progressFill.style.width = '0%';
-        progressText.textContent = `Generating 0 / ${csvData.length}`;
-
-        // Send data to plugin for generation
-        parent.postMessage({ pluginMessage: { type: 'generate', data: csvData } }, '*');
-
-      } else if (currentTab === 'url') {
-        // Fetch from URL
-        if (!validateSheetUrl(sheetUrlInput.value)) {
-          showStatus('Invalid Google Sheets URL', 'error');
-          return;
-        }
-
-        generateBtn.disabled = true;
-        generateBtn.innerHTML = '<span>⏳</span><span>Fetching data...</span>';
-
-        // Send URL to plugin code to fetch
-        parent.postMessage({
-          pluginMessage: {
-            type: 'fetch-sheet',
-            url: sheetUrlInput.value
-          }
-        }, '*');
+      if (!csvData) {
+        showStatus('Please upload a CSV file first', 'error');
+        return;
       }
+
+      // Use CSV file data directly
+      generateBtn.disabled = true;
+      generateBtn.innerHTML = '<span>⏳</span><span>Processing...</span>';
+
+      // Check for missing columns
+      const dataColumns = Object.keys(csvData[0] || {});
+      const missingColumns = placeholders.filter(p => !dataColumns.includes(p));
+
+      if (missingColumns.length > 0) {
+        showStatus(`Warning: Missing columns in CSV:\n${missingColumns.join(', ')}`, 'error');
+      }
+
+      // Show progress bar
+      progressContainer.classList.add('visible');
+      progressFill.style.width = '0%';
+      progressText.textContent = `Generating 0 / ${csvData.length}`;
+
+      // Send data to plugin for generation
+      parent.postMessage({ pluginMessage: { type: 'generate', data: csvData } }, '*');
     });
 
     // Handle messages from plugin
@@ -696,27 +586,6 @@
         step2Text.classList.remove('active');
 
         updateButtonState();
-      }
-
-      if (msg.type === 'sheet-data') {
-        // Successfully fetched data from plugin
-        const data = msg.data;
-
-        // Check for missing columns
-        const dataColumns = Object.keys(data[0] || {});
-        const missingColumns = placeholders.filter(p => !dataColumns.includes(p));
-
-        if (missingColumns.length > 0) {
-          showStatus(`Warning: Missing columns in sheet:\n${missingColumns.join(', ')}`, 'error');
-        }
-
-        // Show progress bar
-        progressContainer.classList.add('visible');
-        progressFill.style.width = '0%';
-        progressText.textContent = `Generating 0 / ${data.length}`;
-
-        // Send data to plugin for generation
-        parent.postMessage({ pluginMessage: { type: 'generate', data: data } }, '*');
       }
 
       if (msg.type === 'progress') {
