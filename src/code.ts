@@ -1,6 +1,7 @@
 /// <reference types="@figma/plugin-typings" />
 
 // Certificate Generator Plugin - Main Code
+// Author: MT • Sreedev
 // This file runs in Figma's sandbox environment
 
 // Create a logger that sends messages to the UI

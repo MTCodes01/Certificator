@@ -323,6 +323,26 @@
     .step-text.active {\r
       color: var(--text-primary);\r
     }\r
+\r
+    .watermark {\r
+      margin-top: 24px;\r
+      padding-top: 16px;\r
+      border-top: 1px solid var(--border);\r
+      text-align: center;\r
+      font-size: 11px;\r
+      color: var(--text-secondary);\r
+      opacity: 0.7;\r
+    }\r
+\r
+    .watermark a {\r
+      color: var(--accent);\r
+      text-decoration: none;\r
+      transition: opacity 0.2s;\r
+    }\r
+\r
+    .watermark a:hover {\r
+      opacity: 0.8;\r
+    }\r
   </style>\r
 </head>\r
 \r
@@ -610,6 +630,10 @@
       }\r
     };\r
   <\/script>\r
+\r
+  <div class="watermark">\r
+    Made with \u2764\uFE0F by <strong>MT \u2022 Sreedev</strong>\r
+  </div>\r
 </body>\r
 \r
 </html>`,{width:360,height:720,themeColors:!0});var r=null;function S(e){let t=new Set;function a(n){if(n.type==="TEXT"){let i=n.characters.match(/#[a-zA-Z_][a-zA-Z0-9_]*/g);i&&i.forEach(c=>t.add(c.substring(1).toLowerCase()))}"children"in n&&n.children.forEach(o=>a(o))}return a(e),Array.from(t)}function C(e){let t=e.match(/#[a-zA-Z_][a-zA-Z0-9_]*/g);return t?t.map(a=>a.substring(1).toLowerCase()):[]}function u(e,t){return p(this,null,function*(){if(e.type==="TEXT"){let a=e,n=a.characters;yield Promise.all(a.getRangeAllFontNames(0,a.characters.length).map(o=>figma.loadFontAsync(o)));for(let[o,i]of Object.entries(t)){let c=new RegExp(`#${o}`,"gi");n=n.replace(c,i)}a.characters=n}if("children"in e)for(let a of e.children)yield u(a,t)})}function T(e,t){let a=e;for(let[n,o]of Object.entries(t)){let i=new RegExp(`#${n}`,"gi");a=a.replace(i,o)}return a}function _(e){return p(this,null,function*(){if(!r){figma.ui.postMessage({type:"error",error:"No template frame selected"});return}let t=r.width,a=r.height,n=e.length,o=Math.min(20,n),i=Math.ceil(n/o),c=.5,g=.25,s=t*c,m=a*g,N=r.x+t+s,P=r.y,f=[];for(let l=0;l<e.length;l++){let d=e[l],M=Math.floor(l/o),x=l%o,R=N+M*(t+s),A=P+x*(a-m),h=r.clone();h.x=R,h.y=A,h.name=T(r.name,d),yield u(h,d),f.push(h),figma.ui.postMessage({type:"progress",current:l+1,total:e.length})}figma.currentPage.selection=f,figma.viewport.scrollAndZoomIntoView(f),figma.ui.postMessage({type:"complete",count:f.length})})}function y(){let e=figma.currentPage.selection;if(e.length===1&&e[0].type==="FRAME"){r=e[0];let t=S(r),a=C(r.name),n=[...new Set([...t,...a])];figma.ui.postMessage({type:"template-selected",name:r.name,placeholders:n})}else r=null,figma.ui.postMessage({type:"no-template"})}figma.on("selectionchange",y);y();figma.ui.onmessage=e=>p(w,null,function*(){if(e.type==="generate"){if(!e.data||e.data.length===0){figma.ui.postMessage({type:"error",error:"No data received"});return}try{yield _(e.data)}catch(t){figma.ui.postMessage({type:"error",error:t instanceof Error?t.message:"Unknown error occurred"})}}e.type==="cancel"&&figma.closePlugin()})});v();})();

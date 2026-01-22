@@ -110,6 +110,12 @@ Certificator/
 - `Certificate - #name`
 - `#course - #date`
 
+## Author
+
+**MT • Sreedev**
+
+Made with ❤️
+
 ## License
 
 MIT
