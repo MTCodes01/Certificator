@@ -23,7 +23,7 @@ interface PluginMessage {
 // Show the plugin UI
 figma.showUI(__html__, { 
   width: 360, 
-  height: 480,
+  height: 720,
   themeColors: true
 });
 
