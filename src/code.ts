@@ -18,10 +18,6 @@ interface PluginMessage {
   error?: string;
 }
 
-// Configuration for frame layout
-const FRAMES_PER_COLUMN = 5;
-const FRAME_SPACING = 50;
-
 // Show the plugin UI
 figma.showUI(__html__, { 
   width: 360, 
@@ -109,7 +105,17 @@ async function generateCertificates(data: SheetRow[]): Promise<void> {
   
   const frameWidth = templateFrame.width;
   const frameHeight = templateFrame.height;
-  const startX = templateFrame.x + frameWidth + FRAME_SPACING;
+  
+  // Calculate optimal layout based on number of certificates
+  const totalCerts = data.length;
+  const maxPerColumn = Math.min(50, totalCerts); // Max 5 per column
+  const numColumns = Math.ceil(totalCerts / maxPerColumn);
+  
+  // Adjust spacing for better visibility
+  const horizontalSpacing = frameWidth * 0.5; // 50% of frame width for horizontal gap
+  const verticalSpacing = frameHeight * 0.05;  // 5% of frame height for vertical gap
+  
+  const startX = templateFrame.x + frameWidth + horizontalSpacing;
   const startY = templateFrame.y;
   
   const generatedFrames: FrameNode[] = [];
@@ -118,10 +124,10 @@ async function generateCertificates(data: SheetRow[]): Promise<void> {
     const row = data[i];
     
     // Calculate position (column layout going down, then right)
-    const column = Math.floor(i / FRAMES_PER_COLUMN);
-    const rowIndex = i % FRAMES_PER_COLUMN;
-    const x = startX + column * (frameWidth + FRAME_SPACING);
-    const y = startY + rowIndex * (frameHeight + FRAME_SPACING);
+    const column = Math.floor(i / maxPerColumn);
+    const rowIndex = i % maxPerColumn;
+    const x = startX + column * (frameWidth + horizontalSpacing);
+    const y = startY + rowIndex * (frameHeight + verticalSpacing);
     
     // Clone the template frame
     const clone = templateFrame.clone();
