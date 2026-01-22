@@ -1,8 +1,10 @@
+/// <reference types="@figma/plugin-typings" />
+
 // Certificate Generator Plugin - Main Code
 // This file runs in Figma's sandbox environment
 
-// Create a console logger that mimics the browser console
-const console = {
+// Create a logger that sends messages to the UI
+const logger = {
   log: (...args: any[]) => figma.ui.postMessage({ type: 'log', message: args }),
   warn: (...args: any[]) => figma.ui.postMessage({ type: 'log', message: ['WARN:', ...args] }),
   error: (...args: any[]) => figma.ui.postMessage({ type: 'log', message: ['ERROR:', ...args] })
